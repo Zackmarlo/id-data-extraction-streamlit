@@ -4,3 +4,4 @@ ultralytics
 easyocr
 numpy
 Pillow
+google
