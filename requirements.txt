@@ -4,4 +4,3 @@ ultralytics
 easyocr
 numpy
 Pillow
-sqlite3
