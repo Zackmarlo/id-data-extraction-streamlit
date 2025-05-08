@@ -1,11 +1,12 @@
 import streamlit as st
 import cv2
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
 from YOLO import detect_and_crop
 from OCR import extract_text
 from database import insert_to_db
 import os
 import shutil
+
 
 # Define the VideoProcessor class to process the webcam feed
 class VideoProcessor(VideoProcessorBase):
