@@ -11,7 +11,7 @@ st.title("Egyptian ID Data Extraction")
 frame_placeholder = st.empty()
 status_placeholder = st.empty()
 
-camera = cv2.VideoCapture(0)  # or use Streamlit's st.camera_input if manual capture
+camera = cv2.VideoCapture(1)  # or use Streamlit's st.camera_input if manual capture
 
 while True:
     ret, frame = camera.read()
