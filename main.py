@@ -10,8 +10,6 @@ import shutil
 # Define the VideoTransformer class to process the webcam feed
 class VideoTransformer(VideoTransformerBase):
     def __init__(self):
-        self.frame_placeholder = None
-        self.status_placeholder = None
         self.detections_done = False
 
     def transform(self, frame):
@@ -22,8 +20,7 @@ class VideoTransformer(VideoTransformerBase):
         detections, all_boxes_found = detect_and_crop(img)
 
         # Display the frame in Streamlit
-        if self.frame_placeholder:
-            self.frame_placeholder.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), channels="RGB")
+        frame_placeholder.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), channels="RGB")
 
         if all_boxes_found and not self.detections_done:
             self.detections_done = True
@@ -45,11 +42,8 @@ class VideoTransformer(VideoTransformerBase):
             # Clean up temporary crops
             shutil.rmtree(crop_folder)
 
-            return img  # Return the frame to continue displaying
-
         # Return the frame to keep displaying in Streamlit
         return img
-
 
 # Streamlit app layout
 st.title("Egyptian ID Data Extraction")
@@ -61,7 +55,6 @@ status_placeholder = st.empty()
 webrtc_streamer(
     key="example",
     video_transformer_factory=VideoTransformer,
-    on_frame=frame_placeholder.empty(),  # Use the placeholder to display the video
 )
 
 # We update status based on detections
