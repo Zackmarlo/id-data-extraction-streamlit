@@ -5,3 +5,4 @@ easyocr
 numpy
 Pillow
 google-genai
+streamlit-webrtc

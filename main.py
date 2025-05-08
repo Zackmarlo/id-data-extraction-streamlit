@@ -1,40 +1,73 @@
-# main.py
 import streamlit as st
 import cv2
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 from YOLO import detect_and_crop
 from OCR import extract_text
 from database import insert_to_db
 import os
+import shutil
 
+# Define the VideoTransformer class to process the webcam feed
+class VideoTransformer(VideoTransformerBase):
+    def __init__(self):
+        self.frame_placeholder = None
+        self.status_placeholder = None
+        self.detections_done = False
+
+    def transform(self, frame):
+        # Convert the frame to numpy array (BGR format)
+        img = frame.to_ndarray(format="bgr24")
+
+        # Run YOLO detection on the frame
+        detections, all_boxes_found = detect_and_crop(img)
+
+        # Display the frame in Streamlit
+        if self.frame_placeholder:
+            self.frame_placeholder.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), channels="RGB")
+
+        if all_boxes_found and not self.detections_done:
+            self.detections_done = True
+            # Save the crops from YOLO detection for OCR
+            crop_folder = "temp_crops/"
+            if not os.path.exists(crop_folder):
+                os.makedirs(crop_folder)
+            
+            for idx, crop in enumerate(detections):
+                crop_path = os.path.join(crop_folder, f"crop_{idx}.jpg")
+                cv2.imwrite(crop_path, crop)
+
+            # OCR extraction
+            extracted_data = extract_text(crop_folder)
+
+            # Insert extracted data into DB
+            insert_to_db(extracted_data)
+
+            # Clean up temporary crops
+            shutil.rmtree(crop_folder)
+
+            return img  # Return the frame to continue displaying
+
+        # Return the frame to keep displaying in Streamlit
+        return img
+
+
+# Streamlit app layout
 st.title("Egyptian ID Data Extraction")
 
 frame_placeholder = st.empty()
 status_placeholder = st.empty()
 
-camera = cv2.VideoCapture(1)  # or use Streamlit's st.camera_input if manual capture
+# Streamlit WebRTC to access webcam
+webrtc_streamer(
+    key="example",
+    video_transformer_factory=VideoTransformer,
+    on_frame=frame_placeholder.empty(),  # Use the placeholder to display the video
+)
 
-while True:
-    ret, frame = camera.read()
-    if not ret:
-        status_placeholder.error("Failed to capture from camera.")
-        break
+# We update status based on detections
+if "detections_done" in st.session_state and st.session_state.detections_done:
+    status_placeholder.success("All fields detected with confidence > 80%. Data inserted to database.")
+else:
+    status_placeholder.info("Waiting for ID to be scanned...")
 
-    # Run YOLO detection
-    detections, all_boxes_found = detect_and_crop(frame)
-
-    # Show frame in Streamlit
-    frame_placeholder.image(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), channels="RGB")
-
-    if all_boxes_found:
-        status_placeholder.success("All fields detected with confidence > 80%.")
-
-        # Pass cropped fields to OCR
-        extracted_data = extract_text("temp_crops/")
-        
-        # Insert to database
-        insert_to_db(extracted_data)
-
-        # Clean up
-        for file in os.listdir("temp_crops/"):
-            os.remove(os.path.join("temp_crops/", file))
-        break
+# You can add additional UI elements for feedback and actions here
