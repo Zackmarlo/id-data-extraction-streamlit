@@ -70,7 +70,7 @@ status_placeholder = st.empty()
 # Streamlit WebRTC to access webcam
 webrtc_streamer(
     key="example",
-    video_transformer_factory=VideoTransformer,
+    video_processor_factory=VideoTransformer,
 )
 
 # We update status based on detections
