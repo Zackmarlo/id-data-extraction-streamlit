@@ -4,4 +4,4 @@ ultralytics
 easyocr
 numpy
 Pillow
-google
+google-generativeai
