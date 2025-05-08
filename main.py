@@ -6,7 +6,7 @@ from OCR import extract_text
 from database import insert_to_db
 import os
 import shutil
-
+import av
 
 # Define the VideoProcessor class to process the webcam feed
 class VideoProcessor(VideoProcessorBase):
@@ -58,7 +58,7 @@ class VideoProcessor(VideoProcessorBase):
 
             # Clean up temporary crops
             shutil.rmtree(crop_folder)
-
+        av_frame = av.VideoFrame.from_ndarray(img, format="rgb24")
         # Return the frame to keep displaying in Streamlit
         return img
 
