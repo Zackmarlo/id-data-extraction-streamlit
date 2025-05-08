@@ -7,8 +7,8 @@ from database import insert_to_db
 import os
 import shutil
 
-# Define the VideoTransformer class to process the webcam feed
-class VideoTransformer(VideoTransformerBase):
+# Define the VideoProcessor class to process the webcam feed
+class VideoProcessor(VideoProcessorBase):
     def __init__(self):
         self.detections_done = False
 
@@ -70,7 +70,7 @@ status_placeholder = st.empty()
 # Streamlit WebRTC to access webcam
 webrtc_streamer(
     key="example",
-    video_processor_factory=VideoTransformer,
+    video_processor_factory=VideoProcessor,
 )
 
 # We update status based on detections
