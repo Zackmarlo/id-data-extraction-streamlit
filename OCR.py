@@ -17,6 +17,7 @@ id_prompt = "\n".join([
     "the id contains 15 arabic numbers only no dashes or dots"
 ])
 def extract_text(crop_folder):
+    print("Extracting text from images...")
     extracted = {}
     for image in os.listdir(crop_folder):
         id_class = image.split(".")[0]
@@ -32,11 +33,12 @@ def extract_text(crop_folder):
         ])
         if id_class == "id number":
             prompt += "\n" + id_prompt
-        my_file = client.files.upload(file=os.path.join("/content/croped",image))
+        my_file = client.files.upload(file=os.path.join("croped",image))
 
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             contents=[my_file, prompt]
         )
         extracted[id_class] = response.text
+        print(extracted)
     return extracted
