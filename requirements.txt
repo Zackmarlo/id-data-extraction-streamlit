@@ -1,9 +1,6 @@
-streamlit
+google-generativeai
 opencv-python
-ultralytics
-easyocr
 numpy
-Pillow
-google-genai
-streamlit-webrtc
-av
+pandas
+streamlit
+ultralytics
